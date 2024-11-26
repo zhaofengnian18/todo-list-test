@@ -1,0 +1,40 @@
+# Dockerfile
+# 构建阶段
+FROM node:18-alpine as builder
+
+WORKDIR /app
+
+# 复制package文件
+COPY package*.json ./
+
+# 安装依赖
+RUN npm ci
+
+# 复制源代码
+COPY . .
+
+# 如果有构建步骤（例如TypeScript编译），在这里执行
+# RUN npm run build
+
+# 生产阶段
+FROM node:18-alpine
+
+WORKDIR /app
+
+# 安装生产环境依赖
+COPY package*.json ./
+RUN npm ci --only=production
+
+# 从构建阶段复制文件
+COPY --from=builder /app/src ./src
+# 如果有构建输出，也复制过来
+# COPY --from=builder /app/dist ./dist
+
+# 设置环境变量
+ENV NODE_ENV=production
+
+# 暴露端口
+EXPOSE 3000
+
+# 启动命令
+CMD ["node", "src/app.js"]

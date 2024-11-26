@@ -1,0 +1,113 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # todo-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=production
+  #     - MONGODB_URL=mongodb://mongos:27017/todo_app
+  #     - PORT=3000
+  #   depends_on:
+  #     - mongos
+  #   networks:
+  #     - todo_network
+  #   healthcheck:
+  #     test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+
+  # 配置服务器副本集
+  cfgsvr1:
+    container_name: cfgsvr1
+    image: mongo:6.0
+    command: mongod --configsvr --replSet cfgrs --port 27019 --bind_ip_all --noauth
+    volumes:
+      - cfgsvr1:/data/db
+    networks:
+      - todo_network
+    ports:
+      - "27019:27019"
+
+  cfgsvr2:
+    container_name: cfgsvr2
+    image: mongo:6.0
+    command: mongod --configsvr --replSet cfgrs --port 27019 --bind_ip_all --noauth
+    volumes:
+      - cfgsvr2:/data/db
+    networks:
+      - todo_network
+
+  cfgsvr3:
+    container_name: cfgsvr3
+    image: mongo:6.0
+    command: mongod --configsvr --replSet cfgrs --port 27019 --bind_ip_all --noauth
+    volumes:
+      - cfgsvr3:/data/db
+    networks:
+      - todo_network
+
+  # 分片副本集
+  shard1svr1:
+    container_name: shard1svr1
+    image: mongo:6.0
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --bind_ip_all --noauth 
+    volumes:
+      - shard1svr1:/data/db
+    networks:
+      - todo_network
+    ports:
+      - "27018:27018"
+
+  shard1svr2:
+    container_name: shard1svr2
+    image: mongo:6.0
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --bind_ip_all --noauth
+    volumes:
+      - shard1svr2:/data/db
+    networks:
+      - todo_network
+
+  shard1svr3:
+    container_name: shard1svr3
+    image: mongo:6.0
+    command: mongod --shardsvr --replSet shard1rs --port 27018 --bind_ip_all --noauth
+    volumes:
+      - shard1svr3:/data/db
+    networks:
+      - todo_network
+
+  # mongos路由器
+  mongos1:
+    container_name: mongos1
+    image: mongo:6.0
+    command: mongos --configdb cfgrs/cfgsvr1:27019,cfgsvr2:27019,cfgsvr3:27019 --port 27017 --bind_ip_all --noauth
+    ports:
+      - "27017:27017"
+    networks:
+      - todo_network
+    depends_on:
+      - cfgsvr1
+      - cfgsvr2
+      - cfgsvr3
+      - shard1svr1
+      - shard1svr2
+      - shard1svr3
+
+networks:
+  todo_network:
+    driver: bridge
+
+volumes:
+  cfgsvr1:
+  cfgsvr2:
+  cfgsvr3:
+  shard1svr1:
+  shard1svr2:
+  shard1svr3:
