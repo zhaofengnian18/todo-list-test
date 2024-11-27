@@ -1,7 +1,7 @@
 // models/schemas.js
 import mongoose from "mongoose";
 
-// 用户Schema
+// User Schema
 const UserSchema = new mongoose.Schema(
   {
     username: {
@@ -19,9 +19,9 @@ const UserSchema = new mongoose.Schema(
     },
   },
   {
-    // 自动添加版本号
+    // Automatically add version number
     timestamps: true,
-    // 添加分片配置
+    // Add sharding configuration
     shardKey: { username: 1 },
   }
 );

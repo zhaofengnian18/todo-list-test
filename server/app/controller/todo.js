@@ -6,7 +6,7 @@ import { User, TodoList, TodoItem } from "../models/index.js";
 const router = new Router();
 const todoService = new TodoService({ User, TodoList, TodoItem });
 
-// 获取TOP N的TODO项目
+// get top N todo items
 router.get("/top", async (ctx) => {
   const { limit = 10, userId } = ctx.query;
 

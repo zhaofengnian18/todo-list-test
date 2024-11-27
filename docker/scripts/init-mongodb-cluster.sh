@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "等待MongoDB服务启动..."
+echo "Waiting for MongoDB service to start..."
 sleep 30
 
-# 初始化配置服务器副本集
-echo "初始化配置服务器副本集..."
+# Initialize config server replica set
+echo "Initializing config server replica set..."
 docker exec cfgsvr1 mongosh --port 27019 --eval '
 rs.initiate({
   _id: "cfgrs",
@@ -16,11 +16,11 @@ rs.initiate({
   ]
 })'
 
-echo "等待配置服务器副本集初始化..."
+echo "Waiting for config server replica set initialization..."
 sleep 20
 
-# 初始化分片副本集
-echo "初始化分片副本集..."
+# Initialize shard replica set
+echo "Initializing shard replica set..."
 docker exec shard1svr1 mongosh --port 27018 --eval '
 rs.initiate({
   _id: "shard1rs",
@@ -31,20 +31,20 @@ rs.initiate({
   ]
 })'
 
-echo "等待分片副本集初始化..."
+echo "Waiting for shard replica set initialization..."
 sleep 20
 
-# 添加分片到集群
-echo "添加分片到集群..."
+# Add shard to cluster
+echo "Adding shard to cluster..."
 docker exec mongos1 mongosh --eval '
 sh.addShard("shard1rs/shard1svr1:27018,shard1svr2:27018,shard1svr3:27018")
 '
 
-# 为todo_app启用分片
-echo "为todo_app数据库启用分片..."
+# Enable sharding for todo_app
+echo "Enabling sharding for todo_app database..."
 docker exec mongos1 mongosh --eval '
 use todo_app
 sh.enableSharding("todo_app")
 '
 
-echo "MongoDB分片集群初始化完成！"
+echo "MongoDB sharded cluster initialization completed!"

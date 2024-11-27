@@ -10,7 +10,7 @@ describe('TodoService', () => {
     let todoService;
 
     beforeEach(() => {
-      // 创建模拟的模型
+      // Create mock models
       mockTodoItem = {
         aggregate: jest.fn()
       };
@@ -29,26 +29,26 @@ describe('TodoService', () => {
       jest.clearAllMocks();
     });
 
-    it('应该在userId为空时抛出错误', async () => {
-      await expect(todoService.getTopTodoItems()).rejects.toThrow('用户ID不能为空');
+    it('should throw error when userId is empty', async () => {
+      await expect(todoService.getTopTodoItems()).rejects.toThrow('User ID cannot be empty');
     });
 
-    it('应该在userId格式无效时抛出错误', async () => {
-      await expect(todoService.getTopTodoItems('invalid-id')).rejects.toThrow('无效的用户ID格式');
+    it('should throw error when userId format is invalid', async () => {
+      await expect(todoService.getTopTodoItems('invalid-id')).rejects.toThrow('Invalid user ID format');
     });
 
-    it('应该在limit参数无效时抛出错误', async () => {
+    it('should throw error when limit parameter is invalid', async () => {
       const validUserId = new mongoose.Types.ObjectId().toString();
-      await expect(todoService.getTopTodoItems(validUserId, -1)).rejects.toThrow('limit参数必须是大于0的数字');
+      await expect(todoService.getTopTodoItems(validUserId, -1)).rejects.toThrow('Limit parameter must be a number greater than 0');
     });
 
-    it('应该正确返回用户的TOP N条待办事项', async () => {
+    it('should correctly return top N todo items for user', async () => {
       const validUserId = new mongoose.Types.ObjectId().toString();
       const mockItems = [
         {
           _id: new mongoose.Types.ObjectId(),
-          name: '测试待办1',
-          description: '描述1',
+          name: 'Test Todo 1',
+          description: 'Description 1',
           score: 10,
           status: 'PENDING',
           listId: new mongoose.Types.ObjectId(),
@@ -56,8 +56,8 @@ describe('TodoService', () => {
         },
         {
           _id: new mongoose.Types.ObjectId(),
-          name: '测试待办2',
-          description: '描述2', 
+          name: 'Test Todo 2',
+          description: 'Description 2',
           score: 8,
           status: 'IN_PROGRESS',
           listId: new mongoose.Types.ObjectId(),

@@ -5,22 +5,22 @@ class TodoService {
     this.models = models;
   }
 
-  // 获取TOP N的TODO项目
+  // Get top N TODO items
   async getTopTodoItems(userId, limit = 10) {
-    // 参数校验
+    // Parameter validation
     if (!userId) {
-      throw new Error('用户ID不能为空');
+      throw new Error('User ID cannot be empty');
     }
     
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      throw new Error('无效的用户ID格式');
+      throw new Error('Invalid user ID format');
     }
 
     if (typeof limit !== 'number' || limit <= 0) {
-      throw new Error('limit参数必须是大于0的数字');
+      throw new Error('Limit parameter must be a number greater than 0');
     }
 
-    // 使用MongoDB的聚合管道
+    // Use MongoDB aggregation pipeline
     const topItems = await this.models.TodoItem.aggregate([
       {
         $lookup: {
@@ -36,7 +36,7 @@ class TodoService {
       {
         $match: {
           "list.userId": new mongoose.Types.ObjectId(userId),
-          "status": { $ne: "ARCHIVED" } // 排除已归档的项目
+          "status": { $ne: "ARCHIVED" } // Exclude archived items
         },
       },
       {

@@ -23,7 +23,6 @@ services:
   #     retries: 3
   #     start_period: 40s
 
-  # 配置服务器副本集
   cfgsvr1:
     container_name: cfgsvr1
     image: mongo:6.0

@@ -1,4 +1,9 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
+
+// 加载环境变量配置文件
+dotenv.config({ path: path.resolve(process.cwd(), "env/.env") });
 
 async function connectDatabase() {
   const options = {
@@ -6,12 +11,10 @@ async function connectDatabase() {
     useUnifiedTopology: true,
   };
 
-  await mongoose.connect("mongodb://localhost:27017/todo_app", options);
+  const mongoUrl = process.env.MONGODB_URL || "mongodb://localhost:27017/todo_app";
+  await mongoose.connect(mongoUrl, options);
 
-  // 确保索引存在
-//   await mongoose.model("TodoItem").ensureIndexes();
-
-  console.log("Connected to MongoDB");
+  console.log("Connected to MongoDB:", mongoUrl);
 }
 
 export default { connectDatabase };

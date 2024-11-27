@@ -3,7 +3,7 @@ const router = new Router();
 
 router.get("/", async (ctx) => {
   try {
-    // 检查MongoDB连接
+    // check mongodb connection
     await ctx.mongoose.connection.db.admin().ping();
     ctx.body = {
       status: "ok",
